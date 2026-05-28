@@ -106,9 +106,7 @@ results = Time_Series_Univariate.run(
 ## Installation
 
 ```bash
-git clone https://github.com/yourusername/qtml.git
-cd qtml
-pip install -e .
+pip install "git+https://github.com/vxtnv/qtml.git"
 ```
 
 **Dependencies:** `scikit-learn`, `numpy`, `torch`, `lightgbm`, `polars`
