@@ -1,8 +1,14 @@
+import os
+import sys
 import numpy as np
 from sklearn.model_selection import GridSearchCV, RandomizedSearchCV, train_test_split
 from pyrstat import confusionMatrix, postResample
 from qtml.detect_mode import detect_mode
 from sklearn.metrics import mean_squared_error
+
+# macOS + PyTorch + LightGBM: spawned joblib workers crash with OMP pthread conflict.
+# Force single-threaded joblib on macOS to avoid segfaults.
+_MACOS = sys.platform == "darwin"
 
 
 # from sklearn.pipeline import Pipeline
@@ -25,16 +31,22 @@ def run(X, y, models, test_size=0.25, cv=5, random_state=42, n_iter=20):
         # Accept both tuple (model, params, n_jobs) and dict format
         if isinstance(config, tuple):
             model, params, n_jobs = config
-            grid = GridSearchCV(model, params, cv=cv, scoring=scoring, n_jobs=n_jobs)
         else:
             search = config.get("search", "grid")
-            if search == "random":
-                grid = RandomizedSearchCV(config["model"], config["params"], n_iter=n_iter,
-                           cv=cv, scoring=scoring, n_jobs=config.get("n_jobs", -1),
-                           random_state=random_state)
-            else:
-                grid = GridSearchCV(config["model"], config["params"],
-                           cv=cv, scoring=scoring, n_jobs=config.get("n_jobs", -1))
+            model = config["model"]
+            params = config["params"]
+            n_jobs = config.get("n_jobs", -1)
+
+        # macOS: force n_jobs=1 to avoid OMP/pthread crash with PyTorch + LightGBM
+        if _MACOS:
+            n_jobs = 1
+
+        if isinstance(config, dict) and config.get("search") == "random":
+            grid = RandomizedSearchCV(model, params, n_iter=n_iter,
+                       cv=cv, scoring=scoring, n_jobs=n_jobs,
+                       random_state=random_state)
+        else:
+            grid = GridSearchCV(model, params, cv=cv, scoring=scoring, n_jobs=n_jobs)
             
 
         
