@@ -22,15 +22,19 @@ def run(X, y, models, test_size=0.25, cv=5, random_state=42, n_iter=20):
     results = {}
 
     for name, config in models.items():
-        search = config.get("search", "grid")  # Default = "grid"
-
-        if search == "random":
-            grid = RandomizedSearchCV(config["model"], config["params"], n_iter=n_iter,
-                       cv=cv, scoring=scoring, n_jobs=config.get("n_jobs", -1),
-                       random_state=random_state)
+        # Accept both tuple (model, params, n_jobs) and dict format
+        if isinstance(config, tuple):
+            model, params, n_jobs = config
+            grid = GridSearchCV(model, params, cv=cv, scoring=scoring, n_jobs=n_jobs)
         else:
-            grid = GridSearchCV(config["model"], config["params"],
-                       cv=cv, scoring=scoring, n_jobs=config.get("n_jobs", -1))
+            search = config.get("search", "grid")
+            if search == "random":
+                grid = RandomizedSearchCV(config["model"], config["params"], n_iter=n_iter,
+                           cv=cv, scoring=scoring, n_jobs=config.get("n_jobs", -1),
+                           random_state=random_state)
+            else:
+                grid = GridSearchCV(config["model"], config["params"],
+                           cv=cv, scoring=scoring, n_jobs=config.get("n_jobs", -1))
             
 
         
