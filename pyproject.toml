@@ -14,6 +14,7 @@ dependencies = [
     "lightgbm",
     "polars",
     "pyrstat @ git+https://github.com/vxtnv/pyrstat.git",
+    "lassonet",
 ]
 
 [tool.setuptools.packages.find]

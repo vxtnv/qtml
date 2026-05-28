@@ -6,7 +6,7 @@ import torch.nn as nn
 import torch.optim as optim
 from torch.utils.data import DataLoader, TensorDataset
 import importlib
-import NN_Regressor as lnn_module
+import qtml.Models.Cross_Sectional.Regression.NN_Regressor as lnn_module
 importlib.reload(lnn_module)
 
 class NN_Regressor(BaseEstimator, RegressorMixin):

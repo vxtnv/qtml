@@ -1,6 +1,7 @@
 import torch
 torch.set_num_threads(4)
-#torch.set_num_interop_threads(1)
 
-from qtml.Models import MLPRegressor, CNN1DRegressor
+from qtml._nn_models import MLPRegressor, CNN1DRegressor
+from qtml.Models.Cross_Sectional.Classification.Models.LassoNNClassifier import LassoNNClassifier
+from qtml.Models.Cross_Sectional.Classification.Models.NN_Classifier import NN_Classifier
 
