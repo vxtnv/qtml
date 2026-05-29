@@ -37,8 +37,8 @@ def run(X, y, models, test_size=0.25, cv=5, random_state=42, n_iter=20):
             params = config["params"]
             n_jobs = config.get("n_jobs", -1)
 
-        # macOS: force n_jobs=1 to avoid OMP/pthread crash with PyTorch + LightGBM
-        if _MACOS:
+        # macOS: LightGBM + PyTorch OMP conflict crashes forked workers — force single-threaded
+        if _MACOS and "lgbm" in type(model).__name__.lower():
             n_jobs = 1
 
         if isinstance(config, dict) and config.get("search") == "random":
